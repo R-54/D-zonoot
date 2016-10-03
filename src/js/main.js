@@ -1,12 +1,13 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload: preload, create: create, update: update});
 var player;
+var lookingRight = false;
 
 function preload()
 {
     // Background.
     game.load.image('cave', 'assets/cave.jpg');
     // Character.
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('dude', 'assets/diver-swim.png', 73, 50);
 }
 
 function create()
@@ -22,9 +23,9 @@ function create()
     player = game.add.sprite(32, game.world.height - 150, 'dude');
     game.physics.arcade.enable(player);
     player.body.gravity.y = 10;
+    player.anchor.setTo(0.5, 0.5);
     player.body.collideWorldBounds = true;
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    player.animations.add('swim', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, true);
 }
 
 function update()
@@ -35,14 +36,24 @@ function update()
     // The user press the left button.
     if(cursors.left.isDown)
     {
+        if(lookingRight)
+        {
+            player.scale.x *= -1;
+            lookingRight = false;
+        }
         player.body.velocity.x = -150;
-        player.animations.play('left');
+        player.animations.play('swim');
     }
     // The user press the right button.
     else if(cursors.right.isDown)
     {
+        if(!lookingRight)
+        {
+            player.scale.x *= -1;
+            lookingRight = true;
+        }
         player.body.velocity.x = 150;
-        player.animations.play('right');
+        player.animations.play('swim');
     }
     // The user press the up button.
     else if(cursors.up.isDown)
@@ -57,7 +68,6 @@ function update()
     // The user stay still.
     else
     {
-        player.animations.stop();
-        player.frame = 4;
+        player.animations.play('swim');
     }
 }
